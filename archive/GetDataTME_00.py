@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Tue Jan 14 12:02:49 2020
 
@@ -31,8 +31,8 @@ for j in range(len(work_articles_list)):
 
 CountryLanguageParams={'Country' : 'RU','Language' : 'RU',}
 params={**CountryLanguageParams,**SymbolList}
-token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
-app_secret = '0b748f6e5d340d693703'
+token = 'token'
+app_secret = 'app secret'
 action = 'Products/GetProducts' # request method
 
 all_data = product_import_tme(token, app_secret, action, params) 

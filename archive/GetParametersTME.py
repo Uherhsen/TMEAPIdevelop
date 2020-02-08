@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Tue Jan 14 12:02:49 2020
 
@@ -26,8 +26,8 @@ def search_param(articles_list,rng1=0,):
     print('\nГотово')    
 
 params={'Country' : 'RU','Language' : 'RU',}
-token = 'TOKEN'
-app_secret = 'APP SECRET"
+token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
+app_secret = '0b748f6e5d340d693703'
 action = 'Products/GetParameters' # request method, метод пинг Utils/Ping    
 
     

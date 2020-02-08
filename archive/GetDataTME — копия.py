@@ -21,8 +21,8 @@ cord = 'A'+str(1)+':A'+str((i-1))
 work_articles_list = [r[0].value for r in sheet.Range(cord)]
 
 params={'Country' : 'RU','Language' : 'RU',}
-token = 'token'
-app_secret = 'APP SECRET"
+token = 'TOKEN'
+app_secret = 'APP SECRET'
 action = 'Products/Search' # request method, метод пинг Utils/Ping
 
 def ping():

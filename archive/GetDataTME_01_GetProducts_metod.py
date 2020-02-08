@@ -45,7 +45,7 @@ def get_data(i):
     params={**CountryLanguageParams,**SymbolList}
     print(params)
     token = 'TOKEN'
-    app_secret = 'APP SECRET"
+    app_secret = 'APP SECRET'
     action = 'Products/GetProducts' # request method
     all_data = product_import_tme(token, app_secret, action, params) 
     for j in range(len(work_articles_list)):

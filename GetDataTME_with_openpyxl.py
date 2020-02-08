@@ -4,39 +4,35 @@ Created on Tue Jan 14 12:02:49 2020
 
 Получение данных о электронных компонентах с сайта TME через его API
 """
-import win32com.client,time
+import openpyxl,time
 from TME_Python_API import product_import_tme
 
-path = u"X:\\PythonProjects\\TMEAPIdevelop\\APP\\productdata.xlsx"
+path = "X:\\PythonProjects\\TMEAPIdevelop_v6\\APP\\productdata.xlsx"
 
-# Функция считает все ячейки в которых что то написано,до тех пор пока не встретит пустую ячейку "None"
+# Функция считает все ячейки первого столбца в которых что то написано,до тех пор пока не встретит пустую ячейку "None"
 def number_of_articles():
     # Открываем Эксель
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(path) #путь к файлу   
-    sheet = wb.ActiveSheet
+    wb = openpyxl.load_workbook(path)#путь к файлу
+    sheet = wb.active
     #выясняем количество артикулов в файле эксель
     i = 1
-    while sheet.Cells(i,1).value != None:
+    while sheet['A'+str(i)].value != None:
         i+=1
-    wb.Close()
-    Excel.Quit()
-    time.sleep(1)
+    wb.save(path)
     return i-1
 
 # Функция создающая список артикулов. Принимает число артикулов и номер колонки в виде буквы (str): 'A'- первая колонка
     
 def articles_list(n,column):
     # Открываем Эксель
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(path) #путь к файлу   
-    sheet = wb.ActiveSheet
-    cord = column+str(1)+':'+column+str((n)) 
+    wb = openpyxl.load_workbook(path)#путь к файлу
+    sheet = wb.active 
+    cord_in = column+str(1)
+    cord_out = column+str((n)) 
     # формирование списка артикулов
-    return [r[0].value for r in sheet.Range(cord)]
-    wb.Close()
-    Excel.Quit()
-    time.sleep(1)
+    vals = [v[0].value for v in sheet[cord_in : cord_out]] #[r[0].value for r in sheet.Range(cord)]
+    return vals
+    wb.save(path)
     
 # Функция для вывода пинга
     
@@ -49,10 +45,8 @@ def ping():
 def search_articles(articles_list, rng1=0):
     '''Поиск базовых параметров'''
     # Открываем Эксель
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(path) #путь к файлу   
-    sheet = wb.ActiveSheet
-    
+    wb = openpyxl.load_workbook(path)#путь к файлу
+    sheet = wb.active
     rng2=len(articles_list)
     for j in range(rng1,rng2):
         params['SearchPlain'] = str(articles_list[j])
@@ -61,27 +55,26 @@ def search_articles(articles_list, rng1=0):
         try :
             print(all_data['Data']['ProductList'][0]['Symbol'],all_data['Data']['ProductList'][0]['Description'])
             all_data['Data']['ProductList'][0]['Symbol']
-            sheet.Cells(j+1,2).value = all_data['Data']['ProductList'][0]['Symbol']
-            sheet.Cells(j+1,3).value = all_data['Data']['ProductList'][0]['Description']
-            sheet.Cells(j+1,5).value = all_data['Data']['ProductList'][0]['Photo'][2:]
-            sheet.Cells(j+1,6).value = all_data['Data']['ProductList'][0]['ProductInformationPage'][2:]
+            sheet['B'+str(j+1)] = all_data['Data']['ProductList'][0]['Symbol']
+            sheet['C'+str(j+1)] = all_data['Data']['ProductList'][0]['Description']
+            sheet['E'+str(j+1)] = all_data['Data']['ProductList'][0]['Photo'][2:]
+            sheet['F'+str(j+1)] = all_data['Data']['ProductList'][0]['ProductInformationPage'][2:]
             weight = (all_data['Data']['ProductList'][0]['Weight'])
             if all_data['Data']['ProductList'][0]['WeightUnit']=='g':
                 weight = weight*0.001
                 #print('{:f}'.format(weight))
                 weight = round(weight,(('{:f}'.format(weight)).count('0'))+1) # округление
-            sheet.Cells(j+1,4).value = weight
+            sheet['D'+str(j+1)] = weight
         except IndexError:
             if all_data["Status"]=="OK":
                 print('\nСтатус сети ',all_data["Status"],'\nАртикул "'+articles_list[j]+'" отсутствует на TME\n')
-                sheet.Cells(j+1,3).value = 'Артикула нет на TME'
+                sheet['C'+str(j+1)] = 'Артикула нет на TME'
             else:
                 print('\nСтатус сети ',all_data["Status"])
-                sheet.Cells(j+1,3).value = all_data['Data']['ProductList'][0]['Description']
+                sheet['C'+str(j+1)] = all_data['Data']['ProductList'][0]['Description']
                 time.sleep(2) 
             continue
-    wb.Close()
-    Excel.Quit()
+    wb.save(path)
     time.sleep(1)
     print('\nГотово')
     
@@ -90,9 +83,8 @@ def search_articles(articles_list, rng1=0):
     
 def search_param(articles_list,rng1=0,):
     # Открываем Эксель
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(path) #путь к файлу   
-    sheet = wb.ActiveSheet
+    wb = openpyxl.load_workbook(path)#путь к файлу
+    sheet = wb.active
     rng2=len(articles_list)
     print('\nЦикл проставления параметров\n')
     for j in range(rng1,rng2):
@@ -105,25 +97,23 @@ def search_param(articles_list,rng1=0,):
                 prms={}
                 for i in all_data['Data']['ProductList'][0]['ParameterList']:
                     prms[i['ParameterName']] = i['ParameterValue']
-                sheet.Cells(j+1,7).value = str(prms)
+                sheet['G'+str(j+1)] = str(prms)
                 
-                time.sleep(0.1)
+                time.sleep(0.3)
             else:
                 print('ошибка статуса сети')
                 j+=1
         else:
             print('Пропуск артикула')
             j+=1
-    wb.Close()
-    Excel.Quit()
+    wb.save(path)
     time.sleep(1)
     print('\nГотово')
 
 def products_files(articles_list,rng1=0):
     # Открываем Эксель
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(path) #путь к файлу   
-    sheet = wb.ActiveSheet
+    wb = openpyxl.load_workbook(path)#путь к файлу
+    sheet = wb.active
     rng2=len(articles_list)
     print('\nЦикл проставления ссылок на даташит\n')
     for j in range(rng1,rng2):
@@ -133,7 +123,7 @@ def products_files(articles_list,rng1=0):
             if all_data['Status'] == "OK":
                 try:
                     print(all_data['Data']['ProductList'][0]['Files']['DocumentList'][0]['DocumentUrl'][2:],'\n'+('_'*50)) #[0]['DocumentUrl'])
-                    sheet.Cells(j+1,8).value =str(all_data['Data']['ProductList'][0]['Files']['DocumentList'][0]['DocumentUrl'][2:])
+                    sheet['H'+str(j+1)] = str(all_data['Data']['ProductList'][0]['Files']['DocumentList'][0]['DocumentUrl'][2:])
                 except KeyError:
                     print('KeyError')
                     j+=1
@@ -148,18 +138,14 @@ def products_files(articles_list,rng1=0):
             print('Нет артикула','\n'+('_'*50))
             j+=1
     print('\nГотово')
-    time.sleep(1)
-    wb.Close()
-    Excel.Quit()
-          
+    wb.save(path)
     
 params={'Country' : 'RU','Language' : 'RU',}
 token = 'TOKEN'
-app_secret = 'APP DATA'
+app_secret = 'APP secret'
 action1 = 'Products/Search' # request method, метод пинг Utils/Ping
 action2 = 'Products/GetParameters'
 action3 = 'Products/GetProductsFiles'
- 
 
 n = number_of_articles()
 
