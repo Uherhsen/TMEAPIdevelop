@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Tue Jan 14 12:02:49 2020
 
@@ -21,8 +21,8 @@ cord = 'A'+str(1)+':A'+str((i-1))
 work_articles_list = [r[0].value for r in sheet.Range(cord)]
 
 params={'Country' : 'RU','Language' : 'RU',}
-token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
-app_secret = '0b748f6e5d340d693703'
+token = 'token'
+app_secret = 'APP SECRET"
 action = 'Products/Search' # request method, метод пинг Utils/Ping
 
 def ping():
