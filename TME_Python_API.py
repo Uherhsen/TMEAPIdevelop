@@ -1,4 +1,4 @@
-# TME API - example usage with Python
+﻿# TME API - example usage with Python
 # More info and create application at: https://developers.tme.eu
 # Пример хеширования на Python3: https://stackoverflow.com/questions/37763235/unicode-objects-must-be-encoded-before-hashing-error
 # hmac - Keyed-Hashing for Message Authentication
@@ -43,8 +43,8 @@ def api_call(action, params, token, app_secret, show_header=False):
     return html
 
 if __name__ == "__main__":
-    token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
-    app_secret = '0b748f6e5d340d693703'
+    token = 'TOKEN'
+    app_secret = 'APP SECRET'
     action = 'Products/GetProducts' # request method
     params = {
             'SymbolList[0]' : '1N4007-DC',

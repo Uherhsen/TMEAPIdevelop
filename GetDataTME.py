@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Tue Jan 14 12:02:49 2020
 
@@ -8,7 +8,7 @@ import win32com.client,time
 from TME_Python_API import product_import_tme
 
 Excel = win32com.client.Dispatch("Excel.Application")
-wb = Excel.Workbooks.Open(u"productdata.xlsx") #путь к файлу
+wb = Excel.Workbooks.Open(u"d:\\usr\\documents\\Desktop\\TMEAPIdevelop\\APP\\productdata.xlsx") #путь к файлу
 sheet = wb.ActiveSheet
 
 i = 1
