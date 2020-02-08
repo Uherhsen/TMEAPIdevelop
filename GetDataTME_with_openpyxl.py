@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Tue Jan 14 12:02:49 2020
 
@@ -7,10 +7,8 @@ Created on Tue Jan 14 12:02:49 2020
 import openpyxl,time
 from TME_Python_API import product_import_tme
 
-path = "X:\\PythonProjects\\TMEAPIdevelop_v6\\APP\\productdata.xlsx"
-
 # Функция считает все ячейки первого столбца в которых что то написано,до тех пор пока не встретит пустую ячейку "None"
-def number_of_articles():
+def number_of_articles(path):
     # Открываем Эксель
     wb = openpyxl.load_workbook(path)#путь к файлу
     sheet = wb.active
@@ -23,7 +21,7 @@ def number_of_articles():
 
 # Функция создающая список артикулов. Принимает число артикулов и номер колонки в виде буквы (str): 'A'- первая колонка
     
-def articles_list(n,column):
+def articles_list(n,column,path):
     # Открываем Эксель
     wb = openpyxl.load_workbook(path)#путь к файлу
     sheet = wb.active 
@@ -42,7 +40,7 @@ def ping():
         
 # Функция проставляет оригинальные артикулы производлтеля, дескрипшен, ссылку на фото, ссылку на страницу продукта и вес в КГ! 
             
-def search_articles(articles_list, rng1=0):
+def search_articles(articles_list, path, rng1=0):
     '''Поиск базовых параметров'''
     # Открываем Эксель
     wb = openpyxl.load_workbook(path)#путь к файлу
@@ -81,7 +79,7 @@ def search_articles(articles_list, rng1=0):
 # функция использует "экшен" для поиска параметров, к которому нужны оригинальные артикулы,
 # запускается только после функции search_articles
     
-def search_param(articles_list,rng1=0,):
+def search_param(articles_list,path,rng1=0,):
     # Открываем Эксель
     wb = openpyxl.load_workbook(path)#путь к файлу
     sheet = wb.active
@@ -97,6 +95,8 @@ def search_param(articles_list,rng1=0,):
                 prms={}
                 for i in all_data['Data']['ProductList'][0]['ParameterList']:
                     prms[i['ParameterName']] = i['ParameterValue']
+                prms.pop('Производитель','Исключение')
+                prms.pop('#Promotion','Исключение')
                 sheet['G'+str(j+1)] = str(prms)
                 
                 time.sleep(0.3)
@@ -110,7 +110,7 @@ def search_param(articles_list,rng1=0,):
     time.sleep(1)
     print('\nГотово')
 
-def products_files(articles_list,rng1=0):
+def products_files(articles_list, path, rng1=0):
     # Открываем Эксель
     wb = openpyxl.load_workbook(path)#путь к файлу
     sheet = wb.active
@@ -140,17 +140,22 @@ def products_files(articles_list,rng1=0):
     print('\nГотово')
     wb.save(path)
     
-params={'Country' : 'RU','Language' : 'RU',}
-token = 'TOKEN'
-app_secret = 'APP secret'
-action1 = 'Products/Search' # request method, метод пинг Utils/Ping
-action2 = 'Products/GetParameters'
-action3 = 'Products/GetProductsFiles'
-
-n = number_of_articles()
-
-work_articles_list_A = articles_list(n,column='A')    
-search_articles(work_articles_list_A)
-work_articles_list_B = articles_list(n,column='B')
-search_param(work_articles_list_B)
-products_files(work_articles_list_B)
+    
+if __name__ == '__main__': 
+    
+    xlsxpath = "D:\\python_programming\\TMEAPIdevelop_v7\\APP\\productdata.xlsx"
+    
+    params={'Country' : 'RU','Language' : 'RU',}
+    token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
+    app_secret = '0b748f6e5d340d693703'
+    action1 = 'Products/Search' # request method, метод пинг Utils/Ping
+    action2 = 'Products/GetParameters'
+    action3 = 'Products/GetProductsFiles'
+    
+    n = number_of_articles(xlsxpath)
+    
+    work_articles_list_A = articles_list(n, 'A', xlsxpath)    
+    search_articles(work_articles_list_A, xlsxpath)
+    work_articles_list_B = articles_list(n,'B', xlsxpath)
+    search_param(work_articles_list_B, xlsxpath)
+    products_files(work_articles_list_B, xlsxpath)

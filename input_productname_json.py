@@ -5,18 +5,30 @@ Created on Sun Feb  2 09:24:17 2020
 """
 import json
 
-inpt='y'
-print('Записываем элементы в простой массив дт json\n')
-while inpt !='n':
-    datain = input('Добавить элемент:\n')
-    
+def json_load(datain,jsonname):
+    '''Проверяет наличие ДБ, гружает новые элементы'''
     try:
-        data = json.load(open('database.json'))
+        data = json.load(open(jsonname))
     except:
         data = []
-    data.append(datain)
+    # Добавляем избегая повторений
+    if datain not in data: data.append(datain)
+    # Отсортировать
+    sorted(data)
     
-    with open('database.json','w') as file:
+    with open(jsonname,'w') as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
+
+
+if __name__ == "__main__":
+    filename = 'typebase.json'
+    inpt='y'
     
-    inpt = input('Продолжить ? n - нет \n')
+    print('Записываем элементы в простой массив дт json\n')
+    
+    while inpt !='n':
+        datainput = input('Добавить элемент:\n')
+        
+        json_load(datainput)
+        
+        inpt = input('Продолжить ? n - нет \n')
