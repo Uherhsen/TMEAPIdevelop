@@ -17,7 +17,9 @@ def number_of_articles():
     i = 1
     while sheet.Cells(i,1).value != None:
         i+=1
-    wb.Close()    
+    wb.Close()
+    Excel.Quit()
+    time.sleep(1)
     return i-1
 
 # Функция создающая список артикулов. Принимает число артикулов и номер колонки в виде буквы (str): 'A'- первая колонка
@@ -31,6 +33,8 @@ def articles_list(n,column):
     # формирование списка артикулов
     return [r[0].value for r in sheet.Range(cord)]
     wb.Close()
+    Excel.Quit()
+    time.sleep(1)
     
 # Функция для вывода пинга
     
@@ -41,6 +45,7 @@ def ping():
 # Функция проставляет оригинальные артикулы производлтеля, дескрипшен, ссылку на фото, ссылку на страницу продукта и вес в КГ! 
             
 def search_articles(articles_list, rng1=0):
+    '''Поиск базовых параметров'''
     # Открываем Эксель
     Excel = win32com.client.Dispatch("Excel.Application")
     wb = Excel.Workbooks.Open(u"d:\\usr\\documents\\Desktop\\TMEAPIdevelop\\APP\\productdata.xlsx") #путь к файлу   
@@ -75,7 +80,7 @@ def search_articles(articles_list, rng1=0):
             continue
     wb.Close()
     Excel.Quit()
-    time.sleep(2)
+    time.sleep(1)
     print('\nГотово')
     
 # функция использует "экшен" для поиска параметров, к которому нужны оригинальные артикулы,
@@ -95,8 +100,12 @@ def search_param(articles_list,rng1=0,):
             if all_data['Status'] == "OK":
                 print(all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterName'],
                       all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterValue'])
-                sheet.Cells(j+1,7).value =str(all_data['Data']['ProductList'][0]['ParameterList'])
-                time.sleep(0.2)
+                prms={}
+                for i in all_data['Data']['ProductList'][0]['ParameterList']:
+                    prms[i['ParameterName']] = i['ParameterValue']
+                sheet.Cells(j+1,7).value = str(prms)
+                
+                time.sleep(0.1)
             else:
                 print('ошибка статуса сети')
                 j+=1
@@ -105,7 +114,7 @@ def search_param(articles_list,rng1=0,):
             j+=1
     wb.Close()
     Excel.Quit()
-    time.sleep(2)
+    time.sleep(1)
     print('\nГотово')
 
 def products_files(articles_list,rng1=0):
@@ -137,22 +146,23 @@ def products_files(articles_list,rng1=0):
             print('Нет артикула','\n'+('_'*50))
             j+=1
     print('\nГотово')
-    time.sleep(2)
+    time.sleep(1)
     wb.Close()
     Excel.Quit()
           
-n=(number_of_articles()) 
-
-work_articles_list_A = articles_list(n,column='A')
-work_articles_list_B = articles_list(n,column='B')
-
+    
 params={'Country' : 'RU','Language' : 'RU',}
 token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
 app_secret = '0b748f6e5d340d693703'
 action1 = 'Products/Search' # request method, метод пинг Utils/Ping
 action2 = 'Products/GetParameters'
 action3 = 'Products/GetProductsFiles'
-     
+ 
+
+n = number_of_articles()
+
+work_articles_list_A = articles_list(n,column='A')    
 search_articles(work_articles_list_A)
+work_articles_list_B = articles_list(n,column='B')
 search_param(work_articles_list_B)
 products_files(work_articles_list_B)
