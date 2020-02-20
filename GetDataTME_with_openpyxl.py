@@ -73,7 +73,7 @@ def search_articles(articles_list, path, rng1=0):
                 time.sleep(2) 
             continue
     wb.save(path)
-    time.sleep(1)
+    time.sleep(0.1)
     print('\nГотово')
     
 # функция использует "экшен" для поиска параметров, к которому нужны оригинальные артикулы,
@@ -90,8 +90,12 @@ def search_param(articles_list,path,rng1=0,):
             params['SymbolList[0]'] = articles_list[j]
             all_data = product_import_tme(token, app_secret, action2, params)
             if all_data['Status'] == "OK":
-                print(all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterName'],
-                      all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterValue'])
+                try:
+                    print(all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterName'],
+                          all_data['Data']['ProductList'][0]['ParameterList'][1]['ParameterValue'])
+                except IndexError:
+                    print("\nОшибка структуры ответа\n")
+                    continue
                 prms={}
                 for i in all_data['Data']['ProductList'][0]['ParameterList']:
                     prms[i['ParameterName']] = i['ParameterValue']
@@ -109,8 +113,10 @@ def search_param(articles_list,path,rng1=0,):
             print('Пропуск артикула')
             j+=1
     wb.save(path)
-    time.sleep(1)
+    time.sleep(0.1)
     print('\nГотово')
+
+# Проставление ссылок на даташит
 
 def products_files(articles_list, path, rng1=0):
     # Открываем Эксель
@@ -145,7 +151,7 @@ def products_files(articles_list, path, rng1=0):
     
 if __name__ == '__main__': 
     
-    xlsxpath = "X:\\PythonProjects\\TMEAPIdevelop_v9\\APP\\productdata.xlsx"
+    xlsxpath = "D:\\python_programming\\TMEAPIdevelop_v10\\APP\\productdata.xlsx"
     
     params={'Country' : 'RU','Language' : 'RU',}
     token = 'ac434c181917ed4e51c49a2027bfd040e9f2da0054be7'
