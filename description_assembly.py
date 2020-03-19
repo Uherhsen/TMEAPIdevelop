@@ -47,12 +47,43 @@ with open(filename,'w') as file:
 Если во втором словаре при обращении по ключу первый (с нулевым индексом) элемент словаря == "MY_FUNСTION", то запускается альтернативный сценарий, который распаковывает строку-функцию с индексом [1] в этом же словаре'''
 
 # Список для общих замен
-replace_list = [["@",""],[":",""],["'",""],['"',''],["{",""],["}",""],["±","+\- "],["Ø","диам. "],["®",""],["™",""], ["мама","штепсель-розетка"],["папа","штепсель-вилка"],["Монтаж THT","Монтаж в отверстия печатной платы"],["Монтаж PCB","Монтаж на печатную плату"],["DC","постоянного тока"],["AC","переменного тока"]]
+replace_list = [["@",""],[":",""],["'",""],['"',''],["{",""],["}",""],["±","+\- "],["Ø","диам. "],["®",""],["™",""], ["мама","штепсель-розетка"],["папа","штепсель-вилка"],["THT","в отверстия печатной платы"],["PCB","на печатную плату"],["SMD","на поверхность печатной платы"],["DC","постоянного тока"],["AC","переменного тока"]]
+# для замен, принимает массив замент типа [[a,b],[a,b],...[a,b]] и текст в котором a будет заменено на b
+def replaceAB(replList,text):
+    for a,b in replList:
+        text = text.replace(a,b)
+    return text        
 
 def just_parameters(i):
     print("\nВ ячейку сохранены только параметры, без описания: \n\n"+ prod_param+".\n")
-    sheet["I"+str(i)]= 'Параметры без описания:\n '+prod_param+'.'
-
+    sheet["I"+str(i)]= 'Параметры без описания:\n '+prod_param+'.'    
+        
+# Функция для вставки параметров в текстовый шаблон
+def textTemplate(i,link_key):   
+    prms = eval(sheet['G'+str(i)].value)
+    #print(data[1][link_key][1])
+    descTemplate = data[1][link_key][2]
+    prmsDflt = data[1][link_key][3]
+    
+    for j in [*prmsDflt]:
+        if j not in prms:
+            prms[j]= prmsDflt[j]
+    d=descTemplate.format(prms)
+    try:
+        replaceL = data[1][link_key][4]
+        replaceL=replaceL+replace_list
+        for a,b in replaceL:
+            d = d.replace(a,b)
+        print('По текстовому шаблону:\n '+d)
+        #return d
+        sheet["I"+str(i)]= 'По текстовому шаблону:\n '+d
+    except IndexError:
+        print('По текстовому шаблону: нет списка замен\n '+d)
+        #return d
+        for a,b in replace_list:
+            d = d.replace(a,b)
+        sheet["I"+str(i)]= 'По текстовому шаблону, отсутствует список замен:\n '+d
+    
 # Заготовка
 def desc_assembly():
     pass
@@ -65,8 +96,7 @@ for i in range(1, list_range+1):
         prod_param = sheet['G'+str(i)].value
         
         # цикл общих замен
-        for a,b in replace_list:
-            prod_param = prod_param.replace(a,b)
+        prod_param = replaceAB(replace_list,prod_param)
         try:
             # Переменная-ссылка-ключ к словарю с описаниями
             link_key = data[0][name]
@@ -84,10 +114,11 @@ for i in range(1, list_range+1):
                     print('Ошибка в шаблоне-описании')
                     continue
                 try:
-                    for x,y in data[1][link_key][2]:
-                        my_descr = my_descr.replace(x,y)
-                    print('С доп. заменой:\n'+ my_descr)
-                    sheet["I"+str(i)]= 'С доп. заменой:\n'+ my_descr
+                    my_descr=replaceAB(data[1][link_key][2],my_descr) 
+                    #for x,y in data[1][link_key][2]: # остатки после рефакторинга
+#                       #my_descr = my_descr.replace(x,y)
+                    print('С доп. заменой:\n', my_descr)
+                    sheet["I"+str(i)]= 'С доп. заменой:\n'+my_descr
                 except IndexError:
                     print(my_descr)
                     sheet["I"+str(i)]= my_descr
@@ -99,5 +130,3 @@ for i in range(1, list_range+1):
         continue
     
 wb.save(path)
-
-#print(eval(prod_param)['Монтаж']) # Конструкция для превращения строки в словарь, опасно!

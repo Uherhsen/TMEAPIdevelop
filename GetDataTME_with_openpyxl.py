@@ -65,7 +65,7 @@ def search_articles(articles_list, path, rng1=0):
             sheet['D'+str(j+1)] = weight
         except IndexError:
             if all_data["Status"]=="OK":
-                print('\nСтатус сети ',all_data["Status"],'\nАртикул "'+articles_list[j]+'" отсутствует на TME\n')
+                print('\nСтатус сети ',all_data["Status"],'\nАртикул "',articles_list[j],'" отсутствует на TME\n')
                 sheet['C'+str(j+1)] = 'Артикула нет на TME'
             else:
                 print('\nСтатус сети ',all_data["Status"])
